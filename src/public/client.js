@@ -1,7 +1,14 @@
+// import { createRequire } from 'module';
+// const require = createRequire(import.meta.url);
+// const Immutable = require('immutable')
+// const { Immutable } = require('immutable');
+import * as Immutable from 'immutable';
 let store = {
-    user: { name: "Student" },
+    user: { name: "Jingyuan" },
     apod: '',
     rovers: ['Curiosity', 'Opportunity', 'Spirit'],
+    roverData: {},
+    roverName: 'Curiosity'
 }
 
 // add our markup to the page
@@ -19,25 +26,20 @@ const render = async (root, state) => {
 
 // create content
 const App = (state) => {
-    let { rovers, apod } = state
+    let { rovers, apod ,roverData, roverName} = state
 
     return `
-        <header></header>
+        <header>Mars Dashboard</header>
         <main>
             ${Greeting(store.user.name)}
             <section>
-                <h3>Put things on the page!</h3>
-                <p>Here is an example section.</p>
-                <p>
-                    One of the most popular websites at NASA is the Astronomy Picture of the Day. In fact, this website is one of
-                    the most popular websites across all federal agencies. It has the popular appeal of a Justin Bieber video.
-                    This endpoint structures the APOD imagery and associated metadata so that it can be repurposed for other
-                    applications. In addition, if the concept_tags parameter is set to True, then keywords derived from the image
-                    explanation are returned. These keywords could be used as auto-generated hashtags for twitter or instagram feeds;
-                    but generally help with discoverability of relevant imagery.
-                </p>
+                <h3>Image of the day from apod:</h3>
                 ${ImageOfTheDay(apod)}
             </section>
+            <section>
+            <h3>Rover data: </h3>
+            ${RoverData(roverData, roverName)}
+        </section>
         </main>
         <footer></footer>
     `
@@ -92,6 +94,25 @@ const ImageOfTheDay = (apod) => {
     }
 }
 
+const RoverData = (roverData, roverName) => {
+    getRoverData(roverName);
+    const roverByName = roverData[roverName];
+
+    if (roverByName) {
+        return (
+            `
+                <section>
+                  going to insert Rover img
+                </section>
+                    
+            `
+        )
+    } 
+    return `<div> Loading Data... </div>`
+
+}
+
+
 // ------------------------------------------------------  API CALLS
 
 // Example API call
@@ -103,4 +124,20 @@ const getImageOfTheDay = (state) => {
         .then(apod => updateStore(store, { apod }))
 
 }
+
+const getRoverData = (name) => {
+    console.log(`http://localhost:3000/rover/${name}`);
+    fetch(`http://localhost:3000/rover/${name}`)
+        .then(res => res.json())
+        .then(({data}) => updateStore(store, 
+            {
+                roverData: Immutable.set(store.roverData, name, 
+                {
+                    ...store.roverData[name],
+                    ...data
+                })
+            },
+        ))
+};
+
 

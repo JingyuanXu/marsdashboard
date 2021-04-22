@@ -16,7 +16,7 @@ app.use('/', express.static(path.join(__dirname, '../public')))
 app.get('/rover/:name', async (req, res) => {
     try {
         const name = req.params.name.toLowerCase();
-        let ROVER_URL = `https://api.nasa.gov/mars-photos/api/v1/rovers/${name}/photos?sol=1000&api_key=${process.env.API_KEY}`
+        let ROVER_URL = `https://api.nasa.gov/mars-photos/api/v1/rovers/${name}/photos?sol=10&api_key=${process.env.API_KEY}`
 
         let image = await fetch(ROVER_URL)
             .then(res => res.json())

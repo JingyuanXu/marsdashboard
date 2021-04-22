@@ -4,11 +4,11 @@
 // const { Immutable } = require('immutable');
 import * as Immutable from 'immutable';
 let store = {
-    user: { name: "Jingyuan" },
+    user: { name: "DemoUser" },
     apod: '',
     rovers: ['Curiosity', 'Opportunity', 'Spirit'],
-    roverData: {},
-    roverName: 'Curiosity'
+    selectedRoverName: 'Curiosity',
+    photos: []
 }
 
 // add our markup to the page
@@ -18,28 +18,33 @@ const updateStore = (store, newState) => {
     store = Object.assign(store, newState)
     render(root, store)
 }
-
 const render = async (root, state) => {
     root.innerHTML = App(state)
+    const roverLinks = Array.from(document.querySelectorAll('li'));
+    roverLinks.map(li => {
+        li.addEventListener('click', event => {
+            getRoverData(event.target.innerText.toLowerCase());
+        });
+    });
 }
+
 
 
 // create content
 const App = (state) => {
-    let { rovers, apod ,roverData, roverName} = state
+    let {apod} = state
 
     return `
-        <header>Mars Dashboard</header>
+        <header> ${ImageOfTheDay(apod)}</header>
         <main>
             ${Greeting(store.user.name)}
-            <section>
-                <h3>Image of the day from apod:</h3>
-                ${ImageOfTheDay(apod)}
-            </section>
-            <section>
-            <h3>Rover data: </h3>
-            ${RoverData(roverData, roverName)}
-        </section>
+            <h3>Menu </h3>
+            ${createMenu(store.rovers)}
+            
+            <div>
+                ${getPhotos(store.photos)}
+            </div>
+        
         </main>
         <footer></footer>
     `
@@ -94,23 +99,16 @@ const ImageOfTheDay = (apod) => {
     }
 }
 
-const RoverData = (roverData, roverName) => {
-    getRoverData(roverName);
-    const roverByName = roverData[roverName];
-
-    if (roverByName) {
-        return (
-            `
-                <section>
-                  going to insert Rover img
-                </section>
-                    
-            `
-        )
-    } 
-    return `<div> Loading Data... </div>`
-
-}
+const createMenu = rovers => (
+    `
+    <ul>
+        ${rovers
+        .map(rover =>
+            `<li><a href="#">${rover}</a></li>`)
+        .join("")}
+    </ul>
+    `
+)
 
 
 // ------------------------------------------------------  API CALLS
@@ -125,19 +123,42 @@ const getImageOfTheDay = (state) => {
 
 }
 
-const getRoverData = (name) => {
-    console.log(`http://localhost:3000/rover/${name}`);
-    fetch(`http://localhost:3000/rover/${name}`)
-        .then(res => res.json())
-        .then(({data}) => updateStore(store, 
-            {
-                roverData: Immutable.set(store.roverData, name, 
-                {
-                    ...store.roverData[name],
-                    ...data
-                })
-            },
-        ))
+const getPhotos = (photos) => {
+    let imageHtml = '';
+    photos.map(photo => {
+        imageHtml += `
+        <div>
+        <h3>${photo[2]}</h3>
+        <p>${photo[1]}</p>
+        <img src="${photo[0]}">
+        </div>
+    `
+    })
+    return imageHtml;
 };
 
+
+
+const getRoverData = name => {
+    fetch(`http://localhost:3000/rover/${name}`)
+        .then(res => res.json())
+        .then(data => {
+            let photoData = [];
+            data.image.photos.map(rover => {
+                photoData.push([rover.img_src, rover.camera.full_name, rover.earth_date])
+            });
+          
+            let newStore = {
+                user: { name: "DemoUser" },
+                apod: '',
+                rovers: ['Curiosity', 'Opportunity', 'Spirit'],
+                selectedRoverName: 'Curiosity',
+                photos: photoData
+            }
+            
+            updateStore(store, newStore);
+            console.log(data);
+            console.log(photoData);
+        })
+};
 

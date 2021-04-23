@@ -1,8 +1,6 @@
-// import { createRequire } from 'module';
-// const require = createRequire(import.meta.url);
-// const Immutable = require('immutable')
-// const { Immutable } = require('immutable');
 import * as Immutable from 'immutable';
+import './assets/stylesheets/resets.css'
+import './assets/stylesheets/index.css'
 let store = {
     user: { name: "DemoUser" },
     apod: '',
@@ -35,10 +33,12 @@ const App = (state) => {
     let {apod} = state
 
     return `
-        <header> ${ImageOfTheDay(apod)}</header>
+        <header> 
+        ${ImageOfTheDay(apod)}
+        
+        </header>
         <main>
-            ${Greeting(store.user.name)}
-            <h3>Menu </h3>
+            
             ${createMenu(store.rovers)}
             
             <div>
@@ -61,7 +61,7 @@ window.addEventListener('load', () => {
 const Greeting = (name) => {
     if (name) {
         return `
-            <h1>Welcome, ${name}!</h1>
+            <h2>Welcome, ${name}!</h2>
         `
     }
 
@@ -92,8 +92,16 @@ const ImageOfTheDay = (apod) => {
             `)
         } else {
             return (`
-                <img src="${apod.image.url}" height="350px" width="100%" />
+            <div class="post-container">                
+            <div class="post-thumb"><img src="${apod.image.url}"  height= "200px" width = "100%"/></div>
+            <div class="post-content">
+                <h3 class="post-title">${Greeting(store.user.name)}</h3>
                 <p>${apod.image.explanation}</p>
+            </div>
+
+
+                
+                
             `)
         }
     }
@@ -101,7 +109,7 @@ const ImageOfTheDay = (apod) => {
 
 const createMenu = rovers => (
     `
-    <ul>
+    <ul class="nav navbar-nav">
         ${rovers
         .map(rover =>
             `<li><a href="#">${rover}</a></li>`)
@@ -128,12 +136,16 @@ const getPhotos = (photos) => {
     photos.map(photo => {
         imageHtml += `
         <div>
+        <br/>
+        <br/>
+        <br/>
+
         <h3>${store.generalDetails.get(0)}</h3>
         <h3>Landing Date: ${store.generalDetails.get(1)}</h3>
         <h3>Launch Date:${store.generalDetails.get(2)}</h3>
         <h3>Status: ${store.generalDetails.get(3)}</h3>
         <p>Earth Date: ${photo[1]}</p>
-        <img src="${photo[0]}">
+        <img class = "photo" src="${photo[0]}">
         </div>
     `
     })
@@ -164,7 +176,6 @@ const getRoverData = name => {
                 }
                 
                 updateStore(store, newStore);
-                console.log("newstore: ",newStore.generalDetails.get(0));
             }
             
         })

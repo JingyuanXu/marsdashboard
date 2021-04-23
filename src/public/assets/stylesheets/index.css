@@ -10,6 +10,25 @@ body {
 header {
   /* header styles */
 }
+.post-container {
+  margin: 20px 20px 0 0;  
+  border: 5px solid #333;
+  overflow: auto
+}
+.post-thumb {
+  float: left
+}
+.post-thumb img {
+  height: 100px;
+  width: 100%;
+  display: block;
+}
+.post-content {
+}
+.post-title {
+  font-weight: bold;
+  font-size: 200%
+}
 
 main {
   flex: 1;
@@ -19,20 +38,32 @@ main {
 footer {
   /* footer styles */
 }
-
+.photo {
+  width: 10%;
+  border-radius: 50%;
+}
 /* -------------------  TABLET  --------------------- */
 @media (min-width: 768px) {
-  /* use mobile */
+  .photo {
+    width: 30%;
+    border-radius: 5%;
+  }
 }
 
 /* -------------------  DESKTOP  -------------------- */
 
 @media (min-width: 1224px) {
-  /* use mobile */
+  .photo {
+    width: 40%;
+    border-radius: 40%;
+  }
 }
 
 /* -------------------  LARGE SCREENS  -------------- */
 
 @media (min-width: 1824px) {
-  /* use mobile */
+  .photo {
+    width: 50%;
+    border-radius: 20%;
+  }
 }

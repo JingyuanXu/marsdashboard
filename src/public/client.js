@@ -7,8 +7,8 @@ let store = {
     user: { name: "DemoUser" },
     apod: '',
     rovers: ['Curiosity', 'Opportunity', 'Spirit'],
-    selectedRoverName: 'Curiosity',
-    photos: []
+    photos: [],
+    generalDetails: Immutable.List()
 }
 
 // add our markup to the page
@@ -128,8 +128,11 @@ const getPhotos = (photos) => {
     photos.map(photo => {
         imageHtml += `
         <div>
-        <h3>${photo[2]}</h3>
-        <p>${photo[1]}</p>
+        <h3>${store.generalDetails.get(0)}</h3>
+        <h3>Landing Date: ${store.generalDetails.get(1)}</h3>
+        <h3>Launch Date:${store.generalDetails.get(2)}</h3>
+        <h3>Status: ${store.generalDetails.get(3)}</h3>
+        <p>Earth Date: ${photo[1]}</p>
         <img src="${photo[0]}">
         </div>
     `
@@ -144,21 +147,26 @@ const getRoverData = name => {
         .then(res => res.json())
         .then(data => {
             let photoData = [];
+
             data.image.photos.map(rover => {
-                photoData.push([rover.img_src, rover.camera.full_name, rover.earth_date])
+                let array = [rover.img_src, rover.earth_date]
+                photoData.push(array)
             });
           
-            let newStore = {
-                user: { name: "DemoUser" },
-                apod: '',
-                rovers: ['Curiosity', 'Opportunity', 'Spirit'],
-                selectedRoverName: 'Curiosity',
-                photos: photoData
+            let dataExist = data.image.photos[0];
+            if (dataExist){
+                let newStore = {
+                    user: { name: "DemoUser" },
+                    apod: '',
+                    rovers: ['Curiosity', 'Opportunity', 'Spirit'],
+                    photos: photoData,
+                    generalDetails: Immutable.List.of(dataExist.rover.name,dataExist.rover.landing_date,dataExist.rover.launch_date,dataExist.rover.status)
+                }
+                
+                updateStore(store, newStore);
+                console.log("newstore: ",newStore.generalDetails.get(0));
             }
             
-            updateStore(store, newStore);
-            console.log(data);
-            console.log(photoData);
         })
 };
 
